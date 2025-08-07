@@ -1,0 +1,14 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: application-gateway
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: account-route
+              uri: http://localhost:9081
+              predicates:
+                - Path=/account/**

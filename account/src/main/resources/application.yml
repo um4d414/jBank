@@ -1,3 +1,6 @@
+server:
+  port: 9081
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/jbank_db
