@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: jbank-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: jbank_db
+      POSTGRES_USER: jbank_user
+      POSTGRES_PASSWORD: jbank_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - jbank_postgres_data:/var/lib/postgresql/data
+    networks:
+      - jbank-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jbank_user -d jbank_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  jbank_postgres_data:
+    driver: local
+
+networks:
+  jbank-network:
+    driver: bridge

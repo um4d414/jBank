@@ -1,0 +1,3 @@
+rootProject.name = 'jBank'
+include 'account'
+include 'jlib'
