@@ -2,9 +2,8 @@ package ru.umd.jbank.account.web.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.umd.jbank.account.service.AccountManager;
 import ru.umd.jbank.account.data.dto.AccountDto;
-import ru.umd.jbank.account.web.exception.NotFoundException;
+import ru.umd.jbank.account.service.AccountManager;
 
 @RestController
 @RequiredArgsConstructor
@@ -13,8 +12,6 @@ public class AccountController {
 
     @GetMapping("/account/{id}")
     public AccountDto getAccount(@PathVariable Long id) {
-        return accountManager
-            .findAccount(id)
-            .orElseThrow(NotFoundException::new);
+        return accountManager.findAccount(id);
     }
 }

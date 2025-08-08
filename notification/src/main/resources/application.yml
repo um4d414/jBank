@@ -1,0 +1,16 @@
+server:
+  port: 8080
+spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout=5000
+            read-timeout=10000
+
+services:
+  gateway:
+    url: http://localhost:8080
+  account:
+    url: ${services.gateway.url}
