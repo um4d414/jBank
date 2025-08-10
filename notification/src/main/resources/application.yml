@@ -8,8 +8,8 @@ spring:
       client:
         config:
           default:
-            connect-timeout=5000
-            read-timeout=10000
+            connect-timeout: 5000
+            read-timeout: 10000
     consul:
       host: localhost
       port: 8500

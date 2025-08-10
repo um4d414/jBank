@@ -7,8 +7,7 @@ import ru.umd.jbank.transfer.integration.client.account.dto.AccountDto;
 import java.math.BigDecimal;
 
 @FeignClient(
-    name = "account-service",
-    url = "${services.account.url}"
+    name = "account-service"
 )
 public interface AccountClient {
     @GetMapping("/account/{id}")

@@ -7,8 +7,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 @FeignClient(
-    name = "exchange-service",
-    url = "${services.exchange.url}"
+    name = "exchange-service"
 )
 public interface ExchangeClient {
     @GetMapping("/exchange/rates")
