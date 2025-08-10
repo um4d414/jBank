@@ -1,6 +1,8 @@
 server:
-  port: 8080
+  port: 9083
 spring:
+  application:
+    name: cash-service
   cloud:
     openfeign:
       client:
@@ -8,9 +10,31 @@ spring:
           default:
             connect-timeout=5000
             read-timeout=10000
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        enabled: true
+        register: true
+        service-name: ${spring.application.name}
+        instance-id: ${spring.application.name}:${server.port}
+        health-check-path: /actuator/health
+        health-check-interval: 15s
+        tags:
+          - microservice
+          - cash
 
-services:
-  gateway:
-    url: http://localhost:8080
-  account:
-    url: ${services.gateway.url}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,consul
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.consul: DEBUG

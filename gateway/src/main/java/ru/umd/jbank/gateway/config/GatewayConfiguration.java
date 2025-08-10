@@ -11,36 +11,33 @@ public class GatewayConfiguration {
 
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
-        return builder.routes()
-            .route(
-                "account-route", r -> r
-                    .path("/account/**")
-                    .uri("http://localhost:9081")
+        return builder
+            .routes()
+            .route("account-route", r -> r
+                .path("/account/**")
+                .or()
+                .path("/bank-account/**")
+                .uri("lb://account-service")
             )
-            .route(
-                "cash-route", r -> r
-                    .path("/cash/**")
-                    .uri("http://localhost:9082")
+            .route("cash-route", r -> r
+                .path("/cash/**")
+                .uri("lb://cash-service")
             )
-            .route(
-                "blocker-route", r -> r
-                    .path("/validate/**")
-                    .uri("http://localhost:9083")
+            .route("blocker-route", r -> r
+                .path("/validate/**")
+                .uri("lb://blocker-service")
             )
-            .route(
-                "exchange-route", r -> r
-                    .path("/exchange/**")
-                    .uri("http://localhost:9084")
+            .route("exchange-route", r -> r
+                .path("/exchange/**")
+                .uri("lb://exchange-service")
             )
-            .route(
-                "notification-route", r -> r
-                    .path("/notify/**")
-                    .uri("http://localhost:9085")
+            .route("notification-route", r -> r
+                .path("/notify/**")
+                .uri("lb://notification-service")
             )
-            .route(
-                "transfer-route", r -> r
-                    .path("/transfer/**")
-                    .uri("http://localhost:9087")
+            .route("transfer-route", r -> r
+                .path("/transfer/**")
+                .uri("lb://transfer-service")
             )
             .build();
     }

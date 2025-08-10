@@ -2,9 +2,41 @@ server:
   port: 8080
 spring:
   application:
-    name: application-gateway
+    name: gateway-service
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        enabled: true
+        register: true
+        service-name: ${spring.application.name}
+        instance-id: ${spring.application.name}:${server.port}
+        health-check-path: /actuator/health
+        health-check-interval: 15s
+        tags:
+          - gateway
+          - api-gateway
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,consul
+  endpoint:
+    health:
+      show-details: always
+
 
 logging:
   level:
-    ru.umd.jbank.gateway: DEBUG
+    ru.umd.jbank.gateway: INFO
     org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.consul: DEBUG

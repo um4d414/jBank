@@ -1,6 +1,25 @@
 version: '3.8'
 
 services:
+  consul:
+    image: consul:1.15.2
+    container_name: jbank-consul
+    restart: unless-stopped
+    command: agent -server -bootstrap-expect=1 -ui -node=consul-server -client=0.0.0.0 -data-dir=/consul/data
+    ports:
+      - "8500:8500"  # HTTP API и UI
+      - "8600:8600"  # DNS
+    volumes:
+      - consul_data:/consul/data
+    networks:
+      - jbank-network
+    healthcheck:
+      test: [ "CMD", "consul", "info" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
   postgres:
     image: postgres:16-alpine
     container_name: jbank-postgres
@@ -24,6 +43,8 @@ services:
 
 volumes:
   jbank_postgres_data:
+    driver: local
+  consul_data:
     driver: local
 
 networks:

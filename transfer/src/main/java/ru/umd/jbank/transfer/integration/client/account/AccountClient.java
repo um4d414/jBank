@@ -1,13 +1,14 @@
-package ru.umd.jbank.cash.integration.client.account;
+package ru.umd.jbank.transfer.integration.client.account;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
-import ru.umd.jbank.cash.integration.client.account.dto.AccountDto;
+import ru.umd.jbank.transfer.integration.client.account.dto.AccountDto;
 
 import java.math.BigDecimal;
 
 @FeignClient(
-    name = "account-service"
+    name = "account-service",
+    url = "${services.account.url}"
 )
 public interface AccountClient {
     @GetMapping("/account/{id}")

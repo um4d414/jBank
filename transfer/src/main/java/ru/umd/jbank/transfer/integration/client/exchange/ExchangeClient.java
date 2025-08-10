@@ -1,4 +1,4 @@
-package ru.umd.jbank.exchange_generator.integration.client;
+package ru.umd.jbank.transfer.integration.client.exchange;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -7,12 +7,10 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 @FeignClient(
-    name = "exchange-service"
+    name = "exchange-service",
+    url = "${services.exchange.url}"
 )
 public interface ExchangeClient {
-    @PostMapping("/exchange/rates")
-    void saveRates(@RequestBody Map<String, BigDecimal> rates);
-
     @GetMapping("/exchange/rates")
     Map<String, BigDecimal> getRates();
 

@@ -1,27 +1,9 @@
-exchange:
-  generator:
-    enabled: true
-    interval-ms: 1000
-    currencies:
-      - USD
-      - EUR
-      - CNY
-      - RUB
-    initial-rates:
-      USD: 75.50
-      EUR: 85.20
-      CNY: 10.80
-      RUB: 1
-
-
 server:
-  port: 9085
+  port: 9087
 
 spring:
-  main:
-    web-application-type: none
   application:
-    name: exchange-generator-service
+    name: transfer-service
   cloud:
     openfeign:
       client:
@@ -40,8 +22,8 @@ spring:
         health-check-path: /actuator/health
         health-check-interval: 15s
         tags:
-          - microservice
-          - exchange-generator
+          - transfer
+          - cash
 
 management:
   endpoints:
@@ -54,6 +36,5 @@ management:
 
 logging:
   level:
-    ru.umd.jbank.exchange_generator: DEBUG
     org.springframework.cloud.gateway: DEBUG
     org.springframework.cloud.consul: DEBUG

@@ -1,6 +1,38 @@
 server:
-  port: 8080
+  port: 9082
 
 blocker:
   validation:
     success-rate: 75
+
+spring:
+  application:
+    name: blocker-service
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        enabled: true
+        register: true
+        service-name: ${spring.application.name}
+        instance-id: ${spring.application.name}:${server.port}
+        health-check-path: /actuator/health
+        health-check-interval: 15s
+        tags:
+          - microservice
+          - blocker
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,consul
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.consul: DEBUG
