@@ -95,7 +95,7 @@ public class BlockerValidationFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return -1; // Выполняется перед другими фильтрами
+        return -1;
     }
 
     private record BlockerResponse(boolean valid, String message) {}

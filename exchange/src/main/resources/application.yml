@@ -1,0 +1,6 @@
+server:
+  port: 9084
+
+logging:
+  level:
+    ru.umd.jbank.exchange: DEBUG

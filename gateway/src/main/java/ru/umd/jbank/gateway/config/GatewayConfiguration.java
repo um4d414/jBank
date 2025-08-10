@@ -27,6 +27,21 @@ public class GatewayConfiguration {
                     .path("/validate/**")
                     .uri("http://localhost:9083")
             )
+            .route(
+                "exchange-route", r -> r
+                    .path("/exchange/**")
+                    .uri("http://localhost:9084")
+            )
+            .route(
+                "notification-route", r -> r
+                    .path("/notify/**")
+                    .uri("http://localhost:9085")
+            )
+            .route(
+                "transfer-route", r -> r
+                    .path("/transfer/**")
+                    .uri("http://localhost:9087")
+            )
             .build();
     }
 

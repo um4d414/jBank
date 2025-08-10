@@ -1,0 +1,26 @@
+services:
+  exchange:
+    url: http://localhost:9084
+
+exchange:
+  generator:
+    enabled: true
+    interval-ms: 1000
+    currencies:
+      - USD
+      - EUR
+      - CNY
+      - RUB
+    initial-rates:
+      USD: 75.50
+      EUR: 85.20
+      CNY: 10.80
+      RUB: 1
+
+spring:
+  main:
+    web-application-type: none
+
+logging:
+  level:
+    ru.umd.jbank.exchange_generator: DEBUG
