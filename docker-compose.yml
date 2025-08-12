@@ -12,7 +12,6 @@ services:
     volumes:
       - consul_data:/consul/data
       - ./consul-config:/consul/config
-
     networks:
       - jbank-network
     healthcheck:

@@ -1,15 +1,13 @@
-server:
-  port: 8080
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,consul,refresh
-  endpoint:
-    health:
-      show-details: always
-
-logging:
-  level:
-    ru.umd.jbank.gateway: INFO
+spring:
+  application:
+    name: gateway-service
+  config:
+    import: consul:${CONSUL_HOST:localhost}:${CONSUL_PORT:8500}
+  cloud:
+    consul:
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
+      config:
+        enabled: true
+        format: yaml
+        data-key: data

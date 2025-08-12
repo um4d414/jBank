@@ -1,0 +1,6 @@
+server:
+  port: 9082
+
+blocker:
+  validation:
+    success-rate: 75

@@ -1,38 +1,13 @@
-server:
-  port: 9082
-
-blocker:
-  validation:
-    success-rate: 75
-
 spring:
   application:
     name: blocker-service
+  config:
+    import: consul:${CONSUL_HOST:localhost}:${CONSUL_PORT:8500}
   cloud:
     consul:
-      host: localhost
-      port: 8500
-      discovery:
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
+      config:
         enabled: true
-        register: true
-        service-name: ${spring.application.name}
-        instance-id: ${spring.application.name}:${server.port}
-        health-check-path: /actuator/health
-        health-check-interval: 15s
-        tags:
-          - microservice
-          - blocker
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,consul
-  endpoint:
-    health:
-      show-details: always
-
-logging:
-  level:
-    org.springframework.cloud.gateway: DEBUG
-    org.springframework.cloud.consul: DEBUG
+        format: yaml
+        data-key: data

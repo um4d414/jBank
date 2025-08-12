@@ -1,59 +1,13 @@
-exchange:
-  generator:
-    enabled: true
-    interval-ms: 1000
-    currencies:
-      - USD
-      - EUR
-      - CNY
-      - RUB
-    initial-rates:
-      USD: 75.50
-      EUR: 85.20
-      CNY: 10.80
-      RUB: 1
-
-
-server:
-  port: 9085
-
 spring:
-  main:
-    web-application-type: none
   application:
     name: exchange-generator-service
+  config:
+    import: consul:${CONSUL_HOST:localhost}:${CONSUL_PORT:8500}
   cloud:
-    openfeign:
-      client:
-        config:
-          default:
-            connect-timeout: 5000
-            read-timeout: 10000
     consul:
-      host: localhost
-      port: 8500
-      discovery:
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
+      config:
         enabled: true
-        register: true
-        service-name: ${spring.application.name}
-        instance-id: ${spring.application.name}:${server.port}
-        health-check-path: /actuator/health
-        health-check-interval: 15s
-        tags:
-          - microservice
-          - exchange-generator
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,consul
-  endpoint:
-    health:
-      show-details: always
-
-logging:
-  level:
-    ru.umd.jbank.exchange_generator: DEBUG
-    org.springframework.cloud.gateway: DEBUG
-    org.springframework.cloud.consul: DEBUG
+        format: yaml
+        data-key: data

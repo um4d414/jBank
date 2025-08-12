@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    consul:
+      discovery:
+        service-name: gateway-service
+        instance-id: gateway-service:8080
+        tags:
+          - gateway
+          - api-gateway
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: account-route
+          uri: lb://account-service
+          predicates:
+            - Path=/account/**, /bank-account/**
+        - id: cash-route
+          uri: lb://cash-service
+          predicates:
+            - Path=/cash/**
+        - id: exchange-route
+          uri: lb://exchange-service
+          predicates:
+            - Path=/exchange/**
+        - id: notification-route
+          uri: lb://notification-service
+          predicates:
+            - Path=/notify/**
+        - id: transfer-route
+          uri: lb://transfer-service
+          predicates:
+            - Path=/transfer/**
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.consul: INFO
