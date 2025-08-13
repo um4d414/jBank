@@ -7,7 +7,7 @@ import ru.umd.jbank.cash.integration.client.account.dto.AccountDto;
 import java.math.BigDecimal;
 
 @FeignClient(
-    name = "account-service"
+    name = "gateway-service"
 )
 public interface AccountClient {
     @GetMapping("/account/{id}")

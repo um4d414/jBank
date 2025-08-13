@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная - jBank</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Добро пожаловать в jBank!</h1>
+
+    <div th:if="${success}" class="success" th:text="${success}"></div>
+
+    <p>Главная страница будет реализована позже.</p>
+
+    <form th:action="@{/logout}" method="post" style="display: inline;">
+        <button type="submit">Выйти</button>
+    </form>
+</div>
+</body>
+</html>

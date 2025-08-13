@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выход - jBank</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Выход из системы</h1>
+
+    <p>Вы действительно хотите выйти из jBank?</p>
+
+    <form th:action="@{/logout}" method="post">
+        <div>
+            <button type="submit">Выйти</button>
+        </div>
+    </form>
+
+    <p><a th:href="@{/dashboard}">Вернуться на главную</a></p>
+</div>
+</body>
+</html>

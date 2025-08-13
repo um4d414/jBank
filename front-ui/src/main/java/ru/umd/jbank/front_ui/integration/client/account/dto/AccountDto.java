@@ -1,4 +1,4 @@
-package ru.umd.jbank.cash.integration.client.account.dto;
+package ru.umd.jbank.front_ui.integration.client.account.dto;
 
 import java.time.LocalDate;
 import java.util.List;

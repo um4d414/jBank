@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import ru.umd.jbank.notification.integration.client.account.dto.AccountDto;
 
 @FeignClient(
-    name = "account-service"
+    name = "gateway-service"
 )
 public interface AccountClient {
     @GetMapping("/account/{id}")

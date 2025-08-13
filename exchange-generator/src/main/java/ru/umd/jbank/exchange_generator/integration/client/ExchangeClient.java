@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 @FeignClient(
-    name = "exchange-service"
+    name = "gateway-service"
 )
 public interface ExchangeClient {
     @PostMapping("/exchange/rates")

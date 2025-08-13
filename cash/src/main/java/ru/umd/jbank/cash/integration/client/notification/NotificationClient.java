@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
-    name = "notification-service"
+    name = "gateway-service"
 )
 public interface NotificationClient {
     @PostMapping("/notify")

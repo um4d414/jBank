@@ -1,15 +1,5 @@
-server:
-  port: 8080
-
 spring:
   cloud:
-    consul:
-      discovery:
-        service-name: gateway-service
-        instance-id: gateway-service:8080
-        tags:
-          - gateway
-          - api-gateway
     gateway:
       discovery:
         locator:
@@ -20,24 +10,47 @@ spring:
           uri: lb://account-service
           predicates:
             - Path=/account/**, /bank-account/**
+          filters:
+            - name: RequestLogging
+            - name: ResponseLogging
         - id: cash-route
           uri: lb://cash-service
           predicates:
             - Path=/cash/**
+          filters:
+            - name: RequestLogging
         - id: exchange-route
           uri: lb://exchange-service
           predicates:
             - Path=/exchange/**
+          filters:
+            - name: RequestLogging
+        - id: blocker-route
+          uri: lb://blocker-service
+          predicates:
+            - Path=/validate/**
+          filters:
+            - name: RequestLogging
         - id: notification-route
           uri: lb://notification-service
           predicates:
             - Path=/notify/**
+          filters:
+            - name: RequestLogging
         - id: transfer-route
           uri: lb://transfer-service
           predicates:
             - Path=/transfer/**
-
-logging:
-  level:
-    org.springframework.cloud.gateway: DEBUG
-    org.springframework.cloud.consul: INFO
+          filters:
+            - name: RequestLogging
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
