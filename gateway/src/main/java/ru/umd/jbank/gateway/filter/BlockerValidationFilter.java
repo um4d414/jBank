@@ -24,7 +24,6 @@ public class BlockerValidationFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         var path = exchange.getRequest().getPath().toString();
 
-        // Применяем фильтр только к cash операциям
         if (path.startsWith("/cash/") || path.startsWith("/transfer/")) {
             log.info("Проверка через blocker для пути: {}", path);
 

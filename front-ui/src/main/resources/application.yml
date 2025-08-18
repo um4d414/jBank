@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: front-ui-service
+  config:
+    import: consul:${CONSUL_HOST:localhost}:${CONSUL_PORT:8500}
+  cloud:
+    consul:
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
+      config:
+        enabled: true
+        format: yaml
+        data-key: data

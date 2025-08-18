@@ -20,4 +20,9 @@ public class AccountController {
     public AccountDto createAccount(@RequestBody AccountManager.CreateAccountRequestDto requestDto) {
         return accountManager.createAccount(requestDto);
     }
+
+    @GetMapping("/account/by-username/{username}")
+    public AccountDto getAccountByUsername(@PathVariable String username) {
+        return accountManager.findAccountByUsername(username);
+    }
 }

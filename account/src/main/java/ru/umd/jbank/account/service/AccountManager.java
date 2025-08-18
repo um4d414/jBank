@@ -12,6 +12,7 @@ import ru.umd.jbank.account.service.exception.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -131,6 +132,7 @@ public class AccountManager {
 
         return AccountDto.builder()
             .id(savedAccount.getId())
+            .username(savedAccount.getLogin())
             .firstname(savedAccount.getFirstname())
             .lastname(savedAccount.getLastname())
             .birthdate(savedAccount.getBirthdate())
@@ -139,6 +141,35 @@ public class AccountManager {
             .build();
 
     }
+
+    public AccountDto findAccountByUsername(String username) {
+        return accountRepository
+            .findByLogin(username)
+            .map(it -> {
+                var bankingAccounts = bankingAccountRepository
+                    .findAllByAccountId(it.getId())
+                    .stream()
+                    .map(ba -> BankAccountDto.builder()
+                        .id(ba.getId())
+                        .amount(ba.getAmount())
+                        .currency(ba.getCurrency())
+                        .build())
+                    .toList();
+
+                return AccountDto.builder()
+                    .id(it.getId())
+                    .username(it.getLogin())
+                    .password(it.getPassword())
+                    .firstname(it.getFirstname())
+                    .lastname(it.getLastname())
+                    .email(it.getEmail())
+                    .birthdate(it.getBirthdate())
+                    .bankingAccounts(bankingAccounts)
+                    .build();
+            })
+            .orElseThrow(() -> new AccountNotFoundException("Пользователь не найден: " + username));
+    }
+
 
     public record CreateBankAccountRequestDto(
         Long accountId,

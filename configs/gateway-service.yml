@@ -1,3 +1,6 @@
+server:
+  port: 8090
+
 spring:
   cloud:
     gateway:
@@ -11,38 +14,74 @@ spring:
           predicates:
             - Path=/account/**, /bank-account/**
           filters:
-            - name: RequestLogging
-            - name: ResponseLogging
+            - name: Logging
+              args:
+                serviceName: "ACCOUNT-SERVICE"
+                logRequest: true
+                logResponse: true
+                includeHeaders: false
+            - name: Metrics
+
         - id: cash-route
           uri: lb://cash-service
           predicates:
             - Path=/cash/**
           filters:
-            - name: RequestLogging
+            - name: Logging
+              args:
+                serviceName: "CASH-SERVICE"
+                logRequest: true
+                logResponse: false
+                includeHeaders: true
+
         - id: exchange-route
           uri: lb://exchange-service
           predicates:
             - Path=/exchange/**
           filters:
-            - name: RequestLogging
+            - name: Logging
+              args:
+                serviceName: "EXCHANGE-SERVICE"
+                logRequest: true
+                logResponse: true
+                includeHeaders: false
+
         - id: blocker-route
           uri: lb://blocker-service
           predicates:
             - Path=/validate/**
           filters:
-            - name: RequestLogging
+            - name: Logging
+              args:
+                serviceName: "BLOCKER-SERVICE"
+                logRequest: false
+                logResponse: true
+                includeHeaders: false
+
         - id: notification-route
           uri: lb://notification-service
           predicates:
             - Path=/notify/**
           filters:
-            - name: RequestLogging
+            - name: Logging
+              args:
+                serviceName: "NOTIFICATION-SERVICE"
+                logRequest: true
+                logResponse: true
+                includeHeaders: false
+
         - id: transfer-route
           uri: lb://transfer-service
           predicates:
             - Path=/transfer/**
           filters:
-            - name: RequestLogging
+            - name: Logging
+              args:
+                serviceName: "TRANSFER-SERVICE"
+                logRequest: true
+                logResponse: true
+                includeHeaders: true
+
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -54,3 +93,18 @@ spring:
               - DELETE
               - OPTIONS
             allowedHeaders: "*"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,routes
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    org.springframework.cloud.consul: INFO
+    ru.umd.jbank.gateway.filter: DEBUG

@@ -50,13 +50,13 @@ public class ExchangeGeneratorService {
             return BigDecimal.ONE;
         }
 
-        BigDecimal maxChange = rates.get(currency).multiply(new BigDecimal("0.05"));
+        BigDecimal maxChange = rates.get(currency).multiply(new BigDecimal("0.005"));
         BigDecimal change = BigDecimal.valueOf((Math.random() - 0.5) * 2)
             .multiply(maxChange);
 
         return rates.get(currency)
             .add(change)
             .max(new BigDecimal("0.01"))
-            .setScale(2, RoundingMode.HALF_EVEN);
+            .setScale(4, RoundingMode.HALF_EVEN);
     }
 }
