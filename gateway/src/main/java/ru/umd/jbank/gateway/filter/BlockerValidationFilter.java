@@ -9,6 +9,7 @@ import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
@@ -21,7 +22,6 @@ import java.time.Duration;
 @Slf4j
 public class BlockerValidationFilter implements GlobalFilter, Ordered {
     private final WebClient webClient;
-
     private final ReactiveDiscoveryClient discoveryClient;
 
     private static final String BLOCKER_SERVICE_ID = "blocker-service";
@@ -33,7 +33,7 @@ public class BlockerValidationFilter implements GlobalFilter, Ordered {
         if (path.startsWith("/cash/") || path.startsWith("/transfer/")) {
             log.info("Проверка через blocker для пути: {}", path);
 
-            return validateWithBlocker()
+            return validateWithBlocker(exchange)
                 .flatMap(isValid -> {
                     if (isValid) {
                         log.info("Валидация прошла успешно, продолжаем выполнение");
@@ -52,7 +52,7 @@ public class BlockerValidationFilter implements GlobalFilter, Ordered {
         return chain.filter(exchange);
     }
 
-    private Mono<Boolean> validateWithBlocker() {
+    private Mono<Boolean> validateWithBlocker(ServerWebExchange exchange) {
         return getBlockerServiceUrl()
             .flatMap(serviceUrl -> {
                 log.debug("Отправка запроса в blocker-service по адресу: {}", serviceUrl);
@@ -61,18 +61,20 @@ public class BlockerValidationFilter implements GlobalFilter, Ordered {
                     .post()
                     .uri(serviceUrl + "/validate")
                     .accept(MediaType.APPLICATION_JSON)
+                    // OAuth2 токен будет добавлен автоматически через WebClient filter
+                    .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId("service-account"))
                     .retrieve()
                     .bodyToMono(BlockerResponse.class)
                     .map(BlockerResponse::valid)
                     .timeout(Duration.ofSeconds(5));
             })
             .doOnError(error -> log.error("Ошибка при обращении к blocker-service: {}", error.getMessage()))
-            .onErrorReturn(false); // В случае ошибки блокируем операцию
+            .onErrorReturn(false);
     }
 
     private Mono<String> getBlockerServiceUrl() {
         return discoveryClient.getInstances(BLOCKER_SERVICE_ID)
-            .next() // Получаем первый доступный экземпляр
+            .next()
             .map(this::buildServiceUrl)
             .doOnNext(url -> log.debug("Найден blocker-service: {}", url))
             .switchIfEmpty(Mono.error(new RuntimeException("Blocker service не найден в реестре сервисов")));

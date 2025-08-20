@@ -1,0 +1,133 @@
+{
+  "realm": "jbank",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "clients": [
+    {
+      "clientId": "front-ui-service",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "jbank-front-ui-secret",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "access.token.lifespan": "3600"
+      },
+      "redirectUris": [
+        "http://localhost:8081/*"
+      ],
+      "webOrigins": [
+        "http://localhost:8081"
+      ],
+      "defaultClientScopes": [
+        "web-origins",
+        "roles",
+        "profile",
+        "email"
+      ]
+    },
+    {
+      "clientId": "account-service",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "jbank-account-secret",
+      "standardFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "blocker-service",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "jbank-blocker-secret",
+      "standardFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "cash-service",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "jbank-cash-secret",
+      "standardFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "exchange-service",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "jbank-exchange-secret",
+      "standardFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "exchange-generator-service",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "jbank-exchange-generator-secret",
+      "standardFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "gateway-service",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "jbank-gateway-secret",
+      "standardFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "notification-service",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "jbank-notification-secret",
+      "standardFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "transfer-service",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "jbank-transfer-secret",
+      "standardFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "protocol": "openid-connect"
+    }
+
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "service-user",
+        "description": "Role for service-to-service communication"
+      },
+      {
+        "name": "end-user",
+        "description": "Role for end users"
+      }
+    ]
+  }
+}

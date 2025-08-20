@@ -22,6 +22,18 @@ spring:
     locations: classpath:db/migration
     validate-on-migrate: true
 
+jbank:
+  keycloak:
+    server-url: http://localhost:8080
+    realm: jbank
+    resource-server:
+      enabled: true
+      public-paths:
+        - "/actuator/**"
+        - "/api/v1/health/**"
+    enable-feign-interceptor: false
+
 logging:
   level:
     ru.umd.jbank.account: INFO
+    ru.umd.jbank.keycloak: DEBUG

@@ -520,48 +520,41 @@
         }
     }
 
-    // Функция запуска автообновления
-    function startAutoRefresh() {
-        timeLeft = 30;
+    // function startAutoRefresh() {
+    //     timeLeft = 30;
+    //
+    //     countdownInterval = setInterval(() => {
+    //         timeLeft--;
+    //         document.getElementById('refreshTimer').textContent = timeLeft;
+    //
+    //         if (timeLeft <= 0) {
+    //             refreshRates();
+    //         }
+    //     }, 1000);
+    // }
+    //
+    // function resetAutoRefreshTimer() {
+    //     if (countdownInterval) {
+    //         clearInterval(countdownInterval);
+    //     }
+    //     startAutoRefresh();
+    // }
+    //
+    // document.addEventListener('DOMContentLoaded', function () {
+    //     startAutoRefresh();
+    //
+    // });
 
-        // Обновляем таймер каждую секунду
-        countdownInterval = setInterval(() => {
-            timeLeft--;
-            document.getElementById('refreshTimer').textContent = timeLeft;
-
-            if (timeLeft <= 0) {
-                refreshRates();
-            }
-        }, 1000);
-    }
-
-    // Функция сброса таймера автообновления
-    function resetAutoRefreshTimer() {
-        if (countdownInterval) {
-            clearInterval(countdownInterval);
-        }
-        startAutoRefresh();
-    }
-
-    // Запуск автообновления при загрузке страницы
-    document.addEventListener('DOMContentLoaded', function () {
-        startAutoRefresh();
-
-        // ... existing DOMContentLoaded code ...
-    });
-
-    // Ручное обновление курсов
     document.getElementById('refreshRates').addEventListener('click', function () {
         refreshRates();
     });
 
-    // Исправленный калькулятор валют
     document.getElementById('calculateBtn').addEventListener('click', function () {
         const fromCurrency = document.getElementById('fromCurrency').value;
-        const amount = document.getElementById('calculatorAmount').value; // Изменили ID
+        const amount = document.getElementById('calculatorAmount').value;
         const resultDiv = document.getElementById('calculationResult');
 
-        console.log('Калькулятор:', {fromCurrency, amount}); // Отладка
+        console.log('Калькулятор:', {fromCurrency, amount});
 
         if (!fromCurrency || !amount) {
             resultDiv.innerHTML = '<p class="error">Заполните все поля</p>';
@@ -599,7 +592,6 @@
 
         tbody.innerHTML = '';
 
-        // Фильтруем рубль и в JavaScript тоже
         Object.entries(rates)
             .filter(([currency, rate]) => currency !== 'RUB')
             .forEach(([currency, rate]) => {

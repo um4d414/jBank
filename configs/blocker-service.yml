@@ -4,3 +4,17 @@ server:
 blocker:
   validation:
     success-rate: 75
+
+jbank:
+  keycloak:
+    server-url: http://localhost:8080
+    realm: jbank
+    resource-server:
+      enabled: true
+      public-paths:
+        - "/actuator/**"
+        - "/api/v1/health/**"
+    client:
+      client-id: account-service  # если нужно делать исходящие запросы
+      client-secret: jbank-account-secret
+    enable-feign-interceptor: false

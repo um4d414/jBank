@@ -1,0 +1,3 @@
+ru.umd.jbank.keycloak.autoconfigure.KeycloakClientAutoConfiguration
+ru.umd.jbank.keycloak.autoconfigure.KeycloakResourceServerAutoConfiguration
+ru.umd.jbank.keycloak.autoconfigure.KeycloakFeignAutoConfiguration
