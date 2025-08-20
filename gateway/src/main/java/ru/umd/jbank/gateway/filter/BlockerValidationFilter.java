@@ -2,6 +2,8 @@ package ru.umd.jbank.gateway.filter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.ReactiveDiscoveryClient;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -19,6 +21,10 @@ import java.time.Duration;
 @Slf4j
 public class BlockerValidationFilter implements GlobalFilter, Ordered {
     private final WebClient webClient;
+
+    private final ReactiveDiscoveryClient discoveryClient;
+
+    private static final String BLOCKER_SERVICE_ID = "blocker-service";
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -47,15 +53,33 @@ public class BlockerValidationFilter implements GlobalFilter, Ordered {
     }
 
     private Mono<Boolean> validateWithBlocker() {
-        return webClient
-            .post()
-            .uri("http://localhost:9083/validate")
-            .accept(MediaType.APPLICATION_JSON)
-            .retrieve()
-            .bodyToMono(BlockerResponse.class)
-            .map(BlockerResponse::valid)
-            .timeout(Duration.ofSeconds(5))
-            .onErrorReturn(false);
+        return getBlockerServiceUrl()
+            .flatMap(serviceUrl -> {
+                log.debug("Отправка запроса в blocker-service по адресу: {}", serviceUrl);
+
+                return webClient
+                    .post()
+                    .uri(serviceUrl + "/validate")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(BlockerResponse.class)
+                    .map(BlockerResponse::valid)
+                    .timeout(Duration.ofSeconds(5));
+            })
+            .doOnError(error -> log.error("Ошибка при обращении к blocker-service: {}", error.getMessage()))
+            .onErrorReturn(false); // В случае ошибки блокируем операцию
+    }
+
+    private Mono<String> getBlockerServiceUrl() {
+        return discoveryClient.getInstances(BLOCKER_SERVICE_ID)
+            .next() // Получаем первый доступный экземпляр
+            .map(this::buildServiceUrl)
+            .doOnNext(url -> log.debug("Найден blocker-service: {}", url))
+            .switchIfEmpty(Mono.error(new RuntimeException("Blocker service не найден в реестре сервисов")));
+    }
+
+    private String buildServiceUrl(ServiceInstance instance) {
+        return String.format("http://%s:%d", instance.getHost(), instance.getPort());
     }
 
     private Mono<Void> handleBlockedRequest(ServerWebExchange exchange) {

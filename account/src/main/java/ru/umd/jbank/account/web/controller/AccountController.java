@@ -25,4 +25,9 @@ public class AccountController {
     public AccountDto getAccountByUsername(@PathVariable String username) {
         return accountManager.findAccountByUsername(username);
     }
+
+    @GetMapping("/account/bank-account/{bankAccountId}/owner")
+    public Long getBankAccountOwnerId(@PathVariable Long bankAccountId) {
+        return accountManager.getBankAccountOwnerId(bankAccountId);
+    }
 }

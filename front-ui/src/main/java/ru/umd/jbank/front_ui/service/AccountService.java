@@ -49,5 +49,18 @@ public class AccountService {
             return null;
         }
     }
+
+    public Long getBankAccountOwnerId(Long bankAccountId) {
+        try {
+            log.debug("Поиск владельца банковского счета: {}", bankAccountId);
+            Long ownerId = accountClient.getBankAccountOwnerId(bankAccountId);
+            log.debug("Владелец банковского счета {}: {}", bankAccountId, ownerId);
+            return ownerId;
+        } catch (Exception e) {
+            log.error("Ошибка при поиске владельца банковского счета: {}", bankAccountId, e);
+            throw new RuntimeException("Не удалось найти владельца банковского счета", e);
+        }
+    }
+
 }
 

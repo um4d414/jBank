@@ -12,7 +12,6 @@ import ru.umd.jbank.account.service.exception.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -170,6 +169,12 @@ public class AccountManager {
             .orElseThrow(() -> new AccountNotFoundException("Пользователь не найден: " + username));
     }
 
+    public Long getBankAccountOwnerId(Long bankAccountId) {
+        return bankingAccountRepository
+            .findById(bankAccountId)
+            .map(bankAccount -> bankAccount.getAccount().getId())
+            .orElseThrow(() -> new AccountNotFoundException("Банковский счет не найден: " + bankAccountId));
+    }
 
     public record CreateBankAccountRequestDto(
         Long accountId,

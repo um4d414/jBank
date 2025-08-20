@@ -23,4 +23,7 @@ public interface AccountClient {
         @PathVariable("accountId") Long accountId,
         @RequestBody CreateBankAccountRequestDto request
     );
+
+    @GetMapping("/bank-account/{bankAccountId}/owner")
+    Long getBankAccountOwnerId(@PathVariable("bankAccountId") Long bankAccountId);
 }

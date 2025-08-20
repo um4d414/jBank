@@ -1,8 +1,9 @@
-package ru.umd.jbank.front_ui.web.controller.api;
+package ru.umd.jbank.front_ui.web.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.umd.jbank.front_ui.service.ExchangeService;
 
@@ -10,24 +11,23 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@RestController
-@RequestMapping("/api/exchange")
+@Controller
 @RequiredArgsConstructor
 @Slf4j
-public class ExchangeApiController {
+public class ExchangeController {
     private final ExchangeService exchangeService;
 
-    @GetMapping("/rates")
+    @GetMapping("/api/exchange/rates")
+    @ResponseBody
     public ResponseEntity<?> getRates() {
         try {
-            var rates = exchangeService
-                .getAllRates()
+            var rates = exchangeService.getAllRates()
                 .entrySet()
                 .stream()
                 .filter(entry -> !"RUB".equals(entry.getKey()))
                 .collect(Collectors.toMap(
-                    java.util.Map.Entry::getKey,
-                    java.util.Map.Entry::getValue
+                    Map.Entry::getKey,
+                    Map.Entry::getValue
                 ));
 
             return ResponseEntity.ok(rates);
@@ -37,7 +37,8 @@ public class ExchangeApiController {
         }
     }
 
-    @GetMapping("/rate/{currency}")
+    @GetMapping("/api/exchange/rate/{currency}")
+    @ResponseBody
     public ResponseEntity<?> getRate(@PathVariable String currency) {
         try {
             if ("RUB".equals(currency)) {
@@ -56,7 +57,8 @@ public class ExchangeApiController {
         }
     }
 
-    @GetMapping("/calculate")
+    @GetMapping("/api/exchange/calculate")
+    @ResponseBody
     public ResponseEntity<?> calculate(
         @RequestParam String baseCurrency,
         @RequestParam String targetCurrency,
@@ -80,7 +82,6 @@ public class ExchangeApiController {
                 }
                 result = amount.divide(rate, 4, java.math.RoundingMode.HALF_UP);
             } else {
-                // Из валюты в валюту через рубль
                 var baseRate = exchangeService.getRate(baseCurrency);
                 var targetRate = exchangeService.getRate(targetCurrency);
 
