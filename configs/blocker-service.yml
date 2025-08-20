@@ -14,7 +14,4 @@ jbank:
       public-paths:
         - "/actuator/**"
         - "/api/v1/health/**"
-    client:
-      client-id: account-service  # если нужно делать исходящие запросы
-      client-secret: jbank-account-secret
     enable-feign-interceptor: false
