@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # Infrastructure services
   consul:
     image: consul:1.15.2
     container_name: jbank-consul
@@ -20,6 +21,26 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
+
+  consul-import:
+    image: curlimages/curl:8.2.1
+    container_name: consul-import
+    depends_on:
+      consul:
+        condition: service_healthy
+    volumes:
+      - ./configs:/configs:ro
+      - ./consul/import-local.sh:/import-local.sh:ro
+      - ./consul/import-local.ps1:/import-local.ps1:ro
+    environment:
+      CONSUL_ADDR: "http://consul:8500"
+      CONSUL_CONFIG_ENV: "docker"
+      CONSUL_WAIT_TIMEOUT: "60"
+      CONSUL_WAIT_INTERVAL: "2"
+    entrypoint: ["/bin/sh", "-c", "/import-local.sh"]
+    networks:
+      - jbank-network
+    restart: "no"
 
   postgres:
     image: postgres:16-alpine
@@ -49,7 +70,7 @@ services:
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HOSTNAME: localhost
+      KC_HOSTNAME: keycloak
       KC_HTTP_ENABLED: true
       KC_HEALTH_ENABLED: true
       KC_LOG_LEVEL: INFO
@@ -67,7 +88,267 @@ services:
       - start-dev
       - --import-realm
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8080/health/ready || exit 1" ]
+      test: [ "CMD-SHELL", "sh -c 'for i in $(seq 1 60); do (</dev/tcp/127.0.0.1/8080) && exit 0 || sleep 1; done; exit 1'" ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 90s
+
+
+  # Application services
+  account-service:
+    build: ./account
+    container_name: jbank-account
+    restart: unless-stopped
+    environment:
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      KEYCLOAK_HOST: keycloak
+      KEYCLOAK_PORT: 8080
+      CONSUL_CONFIG_ENV: docker
+    ports:
+      - "9081:9081"
+    networks:
+      - jbank-network
+    depends_on:
+      consul:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  blocker-service:
+    build: ./blocker
+    container_name: jbank-blocker
+    restart: unless-stopped
+    environment:
+      CONSUL_CONFIG_ENV: docker
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+      KEYCLOAK_HOST: keycloak
+      KEYCLOAK_PORT: 8080
+    ports:
+      - "9082:9082"
+    networks:
+      - jbank-network
+    depends_on:
+      consul:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9082/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  cash-service:
+    build: ./cash
+    container_name: jbank-cash
+    restart: unless-stopped
+    environment:
+      CONSUL_CONFIG_ENV: docker
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+      KEYCLOAK_HOST: keycloak
+      KEYCLOAK_PORT: 8080
+    ports:
+      - "9083:9083"
+    networks:
+      - jbank-network
+    depends_on:
+      consul:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9083/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  exchange-service:
+    build: ./exchange
+    container_name: jbank-exchange
+    restart: unless-stopped
+    environment:
+      CONSUL_CONFIG_ENV: docker
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+      KEYCLOAK_HOST: keycloak
+      KEYCLOAK_PORT: 8080
+    ports:
+      - "9084:9084"
+    networks:
+      - jbank-network
+    depends_on:
+      consul:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9084/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  exchange-generator-service:
+    build: ./exchange-generator
+    container_name: jbank-exchange-generator
+    restart: unless-stopped
+    environment:
+      CONSUL_CONFIG_ENV: docker
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+      KEYCLOAK_HOST: keycloak
+      KEYCLOAK_PORT: 8080
+    ports:
+      - "9085:9085"
+    networks:
+      - jbank-network
+    depends_on:
+      consul:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9085/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  front-ui-service:
+    build: ./front-ui
+    container_name: jbank-front-ui
+    restart: unless-stopped
+    environment:
+      CONSUL_CONFIG_ENV: docker
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+      KEYCLOAK_HOST: keycloak
+      KEYCLOAK_PORT: 8080
+    ports:
+      - "80:80"
+    networks:
+      - jbank-network
+    depends_on:
+      consul:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  gateway-service:
+    build: ./gateway
+    container_name: jbank-gateway
+    restart: unless-stopped
+    environment:
+      CONSUL_CONFIG_ENV: docker
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+      KEYCLOAK_HOST: keycloak
+      KEYCLOAK_PORT: 8080
+    ports:
+      - "8090:8090"
+    networks:
+      - jbank-network
+    depends_on:
+      consul:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+      account-service:
+        condition: service_healthy
+      cash-service:
+        condition: service_healthy
+      blocker-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  notification-service:
+    build: ./notification
+    container_name: jbank-notification
+    restart: unless-stopped
+    environment:
+      CONSUL_CONFIG_ENV: docker
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+      KEYCLOAK_HOST: keycloak
+      KEYCLOAK_PORT: 8080
+    ports:
+      - "9086:9086"
+    networks:
+      - jbank-network
+    depends_on:
+      consul:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+      account-service:
+        condition: service_healthy
+      cash-service:
+        condition: service_healthy
+      blocker-service:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9086/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  transfer-service:
+    build: ./transfer
+    container_name: jbank-transfer
+    restart: unless-stopped
+    environment:
+      CONSUL_CONFIG_ENV: docker
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+      KEYCLOAK_HOST: keycloak
+      KEYCLOAK_PORT: 8080
+    ports:
+      - "9087:9087"
+    networks:
+      - jbank-network
+    depends_on:
+      consul:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+      account-service:
+        condition: service_healthy
+      cash-service:
+        condition: service_healthy
+      blocker-service:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9087/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 5

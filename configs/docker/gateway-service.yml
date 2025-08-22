@@ -1,0 +1,59 @@
+server:
+  port: 8090
+
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://jbank-keycloak:8080/realms/jbank
+        registration:
+          service-account:
+            client-id: gateway-service
+            client-secret: jbank-gateway-secret
+            authorization-grant-type: client_credentials
+            scope: openid
+            provider: keycloak
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: account-route
+          uri: lb://account-service
+          predicates:
+            - Path=/account/**, /bank-account/**
+        - id: cash-route
+          uri: lb://cash-service
+          predicates:
+            - Path=/cash/**
+        - id: exchange-route
+          uri: lb://exchange-service
+          predicates:
+            - Path=/exchange/**
+        - id: blocker-route
+          uri: lb://blocker-service
+          predicates:
+            - Path=/validate/**
+        - id: notification-route
+          uri: lb://notification-service
+          predicates:
+            - Path=/notify/**
+        - id: transfer-route
+          uri: lb://transfer-service
+          predicates:
+            - Path=/transfer/**
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"

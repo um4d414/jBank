@@ -1,0 +1,17 @@
+server:
+  port: 9082
+
+blocker:
+  validation:
+    success-rate: 75
+
+jbank:
+  keycloak:
+    server-url: http://jbank-keycloak:8080
+    realm: jbank
+    resource-server:
+      enabled: true
+      public-paths:
+        - "/actuator/**"
+        - "/api/v1/health/**"
+    enable-feign-interceptor: false

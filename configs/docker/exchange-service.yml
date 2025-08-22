@@ -1,0 +1,13 @@
+server:
+  port: 9084
+
+jbank:
+  keycloak:
+    server-url: http://jbank-keycloak:8080
+    realm: jbank
+    resource-server:
+      enabled: true
+      public-paths:
+        - "/actuator/**"
+        - "/api/v1/health/**"
+    enable-feign-interceptor: false

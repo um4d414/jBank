@@ -1,0 +1,14 @@
+server:
+  port: 80
+
+jbank:
+  keycloak:
+    server-url: http://jbank-keycloak:8080
+    realm: jbank
+    client:
+      client-id: front-ui-service
+      client-secret: jbank-front-ui-secret
+      principal-name: front-ui-service
+    enable-feign-interceptor: true
+    resource-server:
+      enabled: false

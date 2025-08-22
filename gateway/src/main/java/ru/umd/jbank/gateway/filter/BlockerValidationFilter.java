@@ -61,7 +61,6 @@ public class BlockerValidationFilter implements GlobalFilter, Ordered {
                     .post()
                     .uri(serviceUrl + "/validate")
                     .accept(MediaType.APPLICATION_JSON)
-                    // OAuth2 токен будет добавлен автоматически через WebClient filter
                     .attributes(ServerOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId("service-account"))
                     .retrieve()
                     .bodyToMono(BlockerResponse.class)

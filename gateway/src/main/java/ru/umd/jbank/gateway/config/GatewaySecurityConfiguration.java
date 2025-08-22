@@ -7,12 +7,10 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.client.*;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
-import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizedClientRepository;
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -29,12 +27,8 @@ public class GatewaySecurityConfiguration {
                 .pathMatchers("/api/v1/health/**").permitAll()
                 .anyExchange().authenticated()
             )
-            .oauth2ResourceServer(oauth2 ->
-                                      oauth2.jwt(jwt ->
-                                                     jwt.jwtDecoder(reactiveJwtDecoder())
-                                      )
-            )
-            .oauth2Client(oauth2 -> {}) // Включаем OAuth2 Client
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtDecoder(reactiveJwtDecoder())))
+            .oauth2Client(oauth2 -> {})
             .build();
     }
 
@@ -48,7 +42,8 @@ public class GatewaySecurityConfiguration {
     @Bean
     public ReactiveOAuth2AuthorizedClientManager authorizedClientManager(
         ReactiveClientRegistrationRepository clientRegistrationRepository,
-        ServerOAuth2AuthorizedClientRepository authorizedClientRepository) {
+        ServerOAuth2AuthorizedClientRepository authorizedClientRepository
+    ) {
 
         ReactiveOAuth2AuthorizedClientProvider authorizedClientProvider =
             ReactiveOAuth2AuthorizedClientProviderBuilder.builder()
