@@ -34,7 +34,7 @@ public class GatewaySecurityConfiguration {
 
     @Bean
     public ReactiveJwtDecoder reactiveJwtDecoder() {
-        String jwkSetUri = "http://localhost:8080/realms/jbank/protocol/openid-connect/certs";
+        String jwkSetUri = "http://keycloak:8080/realms/jbank/protocol/openid-connect/certs";
         log.info("Настройка ReactiveJwtDecoder с JWK Set URI: {}", jwkSetUri);
         return NimbusReactiveJwtDecoder.withJwkSetUri(jwkSetUri).build();
     }

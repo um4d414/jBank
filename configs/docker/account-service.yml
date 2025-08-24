@@ -24,7 +24,7 @@ spring:
 
 jbank:
   keycloak:
-    server-url: http://jbank-keycloak:8080
+    server-url: http://keycloak:8080
     realm: jbank
     resource-server:
       enabled: true

@@ -1,8 +1,6 @@
-# language: powershell
 docker-compose up -d --build
 if ($LASTEXITCODE -ne 0) { throw "docker-compose up failed" }
 
-# опционально: дождаться пока контейнер consul будет "ready" (проверка /v1/status/leader)
 $consulUrl = "http://localhost:8500/v1/status/leader"
 $timeout = 60
 $interval = 2
@@ -19,5 +17,4 @@ while ($true) {
   $elapsed += $interval
 }
 
-# Запуск импорта
 docker-compose run --rm consul-import

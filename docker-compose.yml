@@ -1,6 +1,19 @@
 version: '3.8'
 
 services:
+  debug-net:
+    image: nicolaka/netshoot:latest
+    container_name: jbank-debug
+    restart: "no"
+    entrypoint: [ "sleep", "infinity" ]
+    tty: true
+    stdin_open: true
+    networks:
+      - jbank-network
+    depends_on:
+      consul:
+        condition: service_healthy
+
   # Infrastructure services
   consul:
     image: consul:1.15.2
@@ -14,7 +27,9 @@ services:
       - consul_data:/consul/data
       - ./consul-config:/consul/config
     networks:
-      - jbank-network
+      jbank-network:
+        aliases:
+        - consul
     healthcheck:
       test: [ "CMD", "consul", "info" ]
       interval: 30s
@@ -37,7 +52,7 @@ services:
       CONSUL_CONFIG_ENV: "docker"
       CONSUL_WAIT_TIMEOUT: "60"
       CONSUL_WAIT_INTERVAL: "2"
-    entrypoint: ["/bin/sh", "-c", "/import-local.sh"]
+    entrypoint: [ "/bin/sh", "-c", "/import-local.sh" ]
     networks:
       - jbank-network
     restart: "no"
@@ -57,7 +72,7 @@ services:
     networks:
       - jbank-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U jbank_user -d jbank_db"]
+      test: [ "CMD-SHELL", "pg_isready -U jbank_user -d jbank_db" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -107,7 +122,6 @@ services:
       POSTGRES_PORT: 5432
       KEYCLOAK_HOST: keycloak
       KEYCLOAK_PORT: 8080
-      CONSUL_CONFIG_ENV: docker
     ports:
       - "9081:9081"
     networks:
@@ -118,9 +132,9 @@ services:
       postgres:
         condition: service_healthy
       keycloak:
-        condition: service_healthy
+          condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9081/actuator/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:9081/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -131,7 +145,6 @@ services:
     container_name: jbank-blocker
     restart: unless-stopped
     environment:
-      CONSUL_CONFIG_ENV: docker
       CONSUL_HOST: consul
       CONSUL_PORT: 8500
       KEYCLOAK_HOST: keycloak
@@ -172,7 +185,7 @@ services:
       keycloak:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9083/actuator/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:9083/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -252,7 +265,7 @@ services:
       gateway-service:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/actuator/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:80/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -284,7 +297,7 @@ services:
       blocker-service:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8090/actuator/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8090/actuator/health" ]
       interval: 30s
       timeout: 10s
       retries: 5
